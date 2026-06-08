@@ -14,6 +14,9 @@ router.post('/register', async (req, res) => {
     const exists = await User.findOne({ email });
     if (exists) return res.status(400).json({ message: 'Email already registered' });
 
+    const photoSize = profilePhoto ? profilePhoto.length : 0;
+    console.log(`[Register] Creating user ${email} with photo size: ${photoSize} bytes`);
+
     const user = await User.create({
       name,
       email,
@@ -23,8 +26,11 @@ router.post('/register', async (req, res) => {
       role: 'student',
       approvalStatus: 'pending'
     });
+    
+    console.log(`[Register] User ${email} created with photo: ${user.profilePhoto ? 'YES' : 'NO'}`);
     res.json({ message: 'Registration successful! Please wait for teacher approval.' });
   } catch (e) {
+    console.error('[Register Error]', e.message);
     res.status(500).json({ message: e.message });
   }
 });
