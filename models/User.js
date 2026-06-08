@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   password:         { type: String, required: true, minlength: 6 },
   role:             { type: String, enum: ['student', 'teacher'], default: 'student' },
   class:            { type: String, default: '' },
+  profilePhoto:     { type: String, default: '' },
   approvalStatus:   { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
   banned:           { type: Boolean, default: false },
   banReason:        { type: String, default: '' },

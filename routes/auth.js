@@ -5,7 +5,7 @@ const User   = require('../models/User');
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, class: cls } = req.body;
+    const { name, email, password, class: cls, profilePhoto } = req.body;
     if (!name || !email || !password || !cls)
       return res.status(400).json({ message: 'All fields are required' });
     if (password.length < 6)
@@ -14,7 +14,15 @@ router.post('/register', async (req, res) => {
     const exists = await User.findOne({ email });
     if (exists) return res.status(400).json({ message: 'Email already registered' });
 
-    const user = await User.create({ name, email, password, class: cls, role: 'student', approvalStatus: 'pending' });
+    const user = await User.create({
+      name,
+      email,
+      password,
+      class: cls,
+      profilePhoto: profilePhoto || '',
+      role: 'student',
+      approvalStatus: 'pending'
+    });
     res.json({ message: 'Registration successful! Please wait for teacher approval.' });
   } catch (e) {
     res.status(500).json({ message: e.message });
@@ -53,7 +61,14 @@ router.post('/login', async (req, res) => {
 
     res.json({
       token,
-      user: { id: user._id, name: user.name, role: user.role, email: user.email, class: user.class }
+      user: {
+        id: user._id,
+        name: user.name,
+        role: user.role,
+        email: user.email,
+        class: user.class,
+        profilePhoto: user.profilePhoto || ''
+      }
     });
   } catch (e) {
     res.status(500).json({ message: e.message });

@@ -42,7 +42,9 @@ router.get('/my', auth, async (req, res) => {
 // GET /api/results/exam/:examId  — leaderboard for an exam
 router.get('/exam/:examId', auth, async (req, res) => {
   try {
-    const results = await Result.find({ exam: req.params.examId }).sort({ pct: -1 });
+    const results = await Result.find({ exam: req.params.examId })
+      .sort({ pct: -1 })
+      .populate('student', 'profilePhoto');
     res.json(results);
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
@@ -52,7 +54,10 @@ router.get('/public/latest', async (req, res) => {
   try {
     const latestExam = await Exam.findOne({ status: 'completed' }).sort({ date: -1, time: -1 });
     if (!latestExam) return res.json({ exam: null, results: [] });
-    const results = await Result.find({ exam: latestExam._id }).sort({ pct: -1 }).limit(10);
+    const results = await Result.find({ exam: latestExam._id })
+      .sort({ pct: -1 })
+      .limit(10)
+      .populate('student', 'profilePhoto');
     res.json({ exam: latestExam, results });
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
@@ -61,7 +66,10 @@ router.get('/public/latest', async (req, res) => {
 router.get('/all', auth, async (req, res) => {
   try {
     if (req.user.role !== 'teacher') return res.status(403).json({ message: 'Teachers only' });
-    const results = await Result.find().sort({ submittedAt: -1 }).populate('exam', 'title subject');
+    const results = await Result.find()
+      .sort({ submittedAt: -1 })
+      .populate('exam', 'title subject')
+      .populate('student', 'profilePhoto');
     res.json(results);
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
