@@ -44,7 +44,7 @@ router.get('/exam/:examId', auth, async (req, res) => {
   try {
     const results = await Result.find({ exam: req.params.examId })
       .sort({ pct: -1 })
-      .populate('student', 'profilePhoto');
+      .populate('student', 'name email profilePhoto');
     res.json(results);
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
@@ -57,7 +57,7 @@ router.get('/public/latest', async (req, res) => {
     const results = await Result.find({ exam: latestExam._id })
       .sort({ pct: -1 })
       .limit(10)
-      .populate('student', 'profilePhoto');
+      .populate('student', 'name email profilePhoto');
     res.json({ exam: latestExam, results });
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
@@ -69,7 +69,7 @@ router.get('/all', auth, async (req, res) => {
     const results = await Result.find()
       .sort({ submittedAt: -1 })
       .populate('exam', 'title subject')
-      .populate('student', 'profilePhoto');
+      .populate('student', 'name email profilePhoto');
     res.json(results);
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
