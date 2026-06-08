@@ -10,6 +10,7 @@ const resultSchema = new mongoose.Schema({
   total:       { type: Number, required: true },
   pct:         { type: Number, required: true },
   answers:     { type: [Number], default: [] },
+  questionIds: { type: [String], default: [] },
   submittedAt: { type: Date, default: Date.now }
 });
 

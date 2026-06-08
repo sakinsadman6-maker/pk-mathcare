@@ -24,7 +24,8 @@ router.post('/', auth, async (req, res) => {
       examTitle: exam.title,
       examSubject: exam.subject,
       score, total, pct,
-      answers: answers || []
+      answers: answers || [],
+      questionIds: req.body.questionIds || []
     });
     res.json(result);
   } catch (e) { res.status(500).json({ message: e.message }); }
