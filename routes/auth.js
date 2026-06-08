@@ -5,7 +5,10 @@ const User   = require('../models/User');
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
+    console.log('[Register] Request body keys:', Object.keys(req.body));
     const { name, email, password, class: cls, profilePhoto } = req.body;
+    console.log(`[Register] Extracted - name: ${name}, email: ${email}, class: ${cls}, profilePhoto exists: ${!!profilePhoto}, profilePhoto length: ${profilePhoto?.length || 0}`);
+    
     if (!name || !email || !password || !cls)
       return res.status(400).json({ message: 'All fields are required' });
     if (password.length < 6)
@@ -16,6 +19,7 @@ router.post('/register', async (req, res) => {
 
     const photoSize = profilePhoto ? profilePhoto.length : 0;
     console.log(`[Register] Creating user ${email} with photo size: ${photoSize} bytes`);
+    console.log(`[Register] Photo prefix (first 50 chars): ${profilePhoto ? profilePhoto.substring(0, 50) : 'NO PHOTO'}`);
 
     const user = await User.create({
       name,
@@ -27,7 +31,8 @@ router.post('/register', async (req, res) => {
       approvalStatus: 'pending'
     });
     
-    console.log(`[Register] User ${email} created with photo: ${user.profilePhoto ? 'YES' : 'NO'}`);
+    console.log(`[Register] User ${email} created successfully`);
+    console.log(`[Register] Saved profilePhoto: ${user.profilePhoto ? 'YES' : 'NO'}, length: ${user.profilePhoto?.length || 0}`);
     res.json({ message: 'Registration successful! Please wait for teacher approval.' });
   } catch (e) {
     console.error('[Register Error]', e.message);
@@ -87,6 +92,10 @@ router.get('/pending-approvals', require('../middleware/auth'), async (req, res)
     if (req.user.role !== 'teacher') 
       return res.status(403).json({ message: 'Teachers only' });
     const pending = await User.find({ approvalStatus: 'pending' }).select('-password').sort({ createdAt: -1 });
+    console.log(`[Pending] Found ${pending.length} pending students`);
+    pending.forEach((s, i) => {
+      console.log(`[Pending] Student ${i+1}: ${s.name} - profilePhoto: ${s.profilePhoto ? 'YES (len=' + s.profilePhoto.length + ')' : 'NO'}`);
+    });
     res.json(pending);
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
