@@ -46,6 +46,16 @@ router.get('/exam/:examId', auth, async (req, res) => {
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
+// GET /api/results/public/latest  — latest completed exam leaderboard for landing page
+router.get('/public/latest', async (req, res) => {
+  try {
+    const latestExam = await Exam.findOne({ status: 'completed' }).sort({ date: -1, time: -1 });
+    if (!latestExam) return res.json({ exam: null, results: [] });
+    const results = await Result.find({ exam: latestExam._id }).sort({ pct: -1 }).limit(10);
+    res.json({ exam: latestExam, results });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
 // GET /api/results/all  — teacher: all results
 router.get('/all', auth, async (req, res) => {
   try {
